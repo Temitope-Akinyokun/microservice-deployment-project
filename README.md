@@ -120,7 +120,44 @@ This Jenkins pipeline [file](cluster-Jenkinsfile) automates the management of an
 
 3.6 Check build progress, console output, and logs on the Jenkins dashboard.
 
-### 4. Deploying Sock Shop microservices
+### 4. Setup Terraform configuration to provision and manage the infrastructure on AWS. 
+The configuration is organized into logical segments to streamline the deployment process:
+
+- Versions and Global Configuration
+    - 01-versions.tf: Defines Terraform and provider versions.
+    - 02-01-generic-variables.tf: Contains generic variables for multiple modules.
+    - 02-02-local-values.tf: Defines local values for reuse within configurations.
+
+- Networking and VPC Setup
+    - 03-01-vpc-variables.tf: Variables for VPC configuration.
+    - 03-02-vpc-module.tf: VPC setup module.
+    - 03-03-vpc-outputs.tf: VPC outputs.
+
+- Bastion Host Configuration
+    - 04-01-bastion-variables.tf: Variables for Bastion host.
+    - 04-02-bastion-sg.tf: Bastion host security group.
+    - 04-03-ami-datasource.tf: AMI ID data source.
+    - 04-04-bastion-outputs.tf: Bastion host outputs.
+    - 04-05-bastion-ec2-instance.tf: EC2 instance configuration.
+    - 04-06-bastion-elastic-ip.tf: Elastic IP allocation.
+    - 04-07-ec2-bastion-provisioners.tf: Bastion host provisioners.
+
+- EKS Cluster Setup
+    - 05-01-eks-variables.tf: EKS variables.
+    - 05-02-eks-outputs.tf: EKS outputs.
+    - 05-03-iamrole-eks.tf: IAM roles for EKS.
+    - 05-04-iamrole-nodegroup.tf: IAM roles for node groups.
+    - 05-06-eks-cluster.tf: EKS cluster configuration.
+    - 05-07-node-group-public.tf: Public node groups.
+    - 05-08-eks-node-group-private.tf: Private node groups.
+
+- Variable Files
+    - ec2-bastion.auto.tfvars: Bastion host variable values.
+    - eks.auto.tfvars: EKS cluster variable values.
+    - terraform.tfvars: Common variable values.
+    - vpc.auto.tfvars: VPC variable values.
+
+### 5. Deploying Sock Shop microservices
 To facilitate the deployment of a microservices architecture using Terraform, the following configuration files are utilized:
 
 - [provider.tf](kubernetes/micro-services/provider.tf): Sets up the cloud provider and namespace configurations.
