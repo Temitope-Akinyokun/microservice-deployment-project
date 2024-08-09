@@ -1,6 +1,6 @@
 data "aws_eks_node_group" "eks-node-group" {
   cluster_name = "sock-cluster"
-  node_group_name = "hr-dev-eks-ng-public"
+  node_group_name = "sock-cluster-ng-public"
 }
 
 resource "time_sleep" "wait_for_kubernetes" {

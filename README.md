@@ -203,11 +203,8 @@ kubectl edit svc front-end -n sock-shop
 
 To efficiently manage and monitor the Kubernetes cluster, we use Terraform and Helm to configure essential components like the Nginx Ingress Controller and Prometheus. Below are the key files involved in this setup:
 
-- providers.tf: Defines the necessary providers for Terraform, including Helm, Kubernetes, and Kubectl, and specifies the path to the kube-config file.
-- nginx-ingress-helm.tf: Contains Terraform configurations for deploying the Nginx Ingress Controller using Helm, including namespace and resource definitions.
-- values.yaml: Provides configuration values for customizing the Nginx Ingress Controller installation.
-- variables.tf: Declares variables used across Terraform configurations, allowing for more flexible and reusable code.
-- null.tf: Handles resources or settings that do not directly associate with specific providers but are needed for the overall configuration.
+- [providers.tf](kubernetes/prometheus-helm/provider-prometheus.tf): Defines the necessary providers for Terraform, including Helm, Kubernetes, and Kubectl, and specifies the path to the kube-config file.
+- [values.yaml](kubernetes/prometheus-helm/values.yaml): Provides configuration values for customizing the Nginx Ingress Controller installation.
 
 10.1 Accessing Grafana and Prometheus
 
