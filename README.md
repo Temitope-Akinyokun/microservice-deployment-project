@@ -88,9 +88,6 @@ http://<public_dns_name>:8080
 3.2 Jenkins credentials configuration
 - The GitHub repository is public so there's no need to set up credentials. 
 
-
-3.2 Add credentials in Jenkins to access your GitHub repository. Choose either “Username with password” or SSH credentials based on your repository’s authentication method.
-
 3.3 Create a Jenkins pipeline job
 - Navigate to Jenkins dashboard → "New Item" → Enter job name → Select "Pipeline" → Click "OK".
 - In the job configuration, go to the “Pipeline” section.
@@ -121,41 +118,13 @@ This Jenkins pipeline [file](cluster-Jenkinsfile) automates the management of an
 3.6 Check build progress, console output, and logs on the Jenkins dashboard.
 
 ### 4. Setup Terraform configuration to provision and manage the infrastructure on AWS. 
-The configuration is organized into logical segments to streamline the deployment process:
+The configuration is organized into logical segments in this [folder](eks) to streamline the deployment process:
 
 - Versions and Global Configuration
-    - 01-versions.tf: Defines Terraform and provider versions.
-    - 02-01-generic-variables.tf: Contains generic variables for multiple modules.
-    - 02-02-local-values.tf: Defines local values for reuse within configurations.
-
 - Networking and VPC Setup
-    - 03-01-vpc-variables.tf: Variables for VPC configuration.
-    - 03-02-vpc-module.tf: VPC setup module.
-    - 03-03-vpc-outputs.tf: VPC outputs.
-
 - Bastion Host Configuration
-    - 04-01-bastion-variables.tf: Variables for Bastion host.
-    - 04-02-bastion-sg.tf: Bastion host security group.
-    - 04-03-ami-datasource.tf: AMI ID data source.
-    - 04-04-bastion-outputs.tf: Bastion host outputs.
-    - 04-05-bastion-ec2-instance.tf: EC2 instance configuration.
-    - 04-06-bastion-elastic-ip.tf: Elastic IP allocation.
-    - 04-07-ec2-bastion-provisioners.tf: Bastion host provisioners.
-
 - EKS Cluster Setup
-    - 05-01-eks-variables.tf: EKS variables.
-    - 05-02-eks-outputs.tf: EKS outputs.
-    - 05-03-iamrole-eks.tf: IAM roles for EKS.
-    - 05-04-iamrole-nodegroup.tf: IAM roles for node groups.
-    - 05-06-eks-cluster.tf: EKS cluster configuration.
-    - 05-07-node-group-public.tf: Public node groups.
-    - 05-08-eks-node-group-private.tf: Private node groups.
-
 - Variable Files
-    - ec2-bastion.auto.tfvars: Bastion host variable values.
-    - eks.auto.tfvars: EKS cluster variable values.
-    - terraform.tfvars: Common variable values.
-    - vpc.auto.tfvars: VPC variable values.
 
 ### 5. Deploying Sock Shop microservices
 To facilitate the deployment of a microservices architecture using Terraform, the following configuration files are utilized:
@@ -171,3 +140,71 @@ To facilitate the deployment of a microservices architecture using Terraform, th
 - [session-db.tf](kubernetes/micro-services/session-db.tf): Configures Redis for managing session data.
 - [shipping.tf](kubernetes/micro-services/shipping.tf): Manages the deployment of the Shipping service.
 - [user.tf](kubernetes/micro-services/user.tf): Deploys the User service with MongoDB and includes volume mounts for persistent storage.
+
+### 6 Nginx Ingress Controller setup as a Load balancer
+The Nginx Ingress Controller serves as a load balancer, efficiently routing traffic to various services within a Kubernetes cluster.
+- To define the necessary providers, a [provider.tf file](kubernetes/nginx-controller/providers-nginx.tf) is set up. The three providers required here are Helm, Kubernetes and Kubectl. A data resource to reference the cluster, which will help configure the Kubernetes, Helm, and Kubectl providers is also included
+
+-  To define the resources necessary for installing the Nginx Ingress Controller, a [helm file](kubernetes/nginx-controller/helm-nginx-ingress.tf). This file will:
+
+        - Deploy the Nginx Ingress Controller using Helm.
+        - Create a namespace for the Nginx Ingress Controller.
+
+- To customize the Nginx Ingress Controller’s deployment, we need to configure the [values.yaml file](kubernetes/nginx-controller/values.yaml). This file contains default settings provided by Nginx, which can be refactored according to the project’s requirements.
+
+- When configuration files are ready, we can proceed with running the Terraform scripts:
+
+```bash
+    terraform init
+    terraform apply --auto-approve
+    kubectl get namespace
+    kubectl get svc -n nginx-controller #This command lists all services running in the 'nginx-controller' namespace.
+```
+
+### 7. Ingress Rule and Provider Setup
+
+- Define an [Ingress rule](kubernetes/ingress-rule/micro.tf) for the Sock Shop microservice. This rule is divided into two sections: metadata and spec.
+
+**Metadata:**
+Contains the name and namespace of the Ingress. The namespace must match that of the service you are targeting (e.g., sock-shop).
+The annotation specifies the Ingress controller.
+Note: The Ingress rule and the service are to be in the same namespace to avoid a 403 gateway error.
+
+**Spec:**
+Specifies the subdomain (e.g., sock-shop.nwokolo.live). Ensure this subdomain is created.
+Targets the front-end service with port 80, matching the service configuration.
+
+### 8. Test, Initialize and Apply Terraform configuration
+- In the terminal, run:
+
+```bash
+    terraform init #Initializes the Terraform project and downloads necessary dependencies.
+    terraform plan #Previews the changes that will be made, allowing you to catch any potential issues in the configuration.
+    terraform apply --auto-approve #Executes the planned changes and provisions the infrastructure without requiring manual approval.
+```
+
+- To verify successful deployment
+```bash
+    kubectl get svc -n sock-shop
+```
+All deployed services will be seen in the **sock shop** namespace.
+
+### 9. Viewing on Browser
+To view the deployed Sock Shop application in your browser, follow these steps:
+
+- After running the previous command, locate the front-end service and then edit it with this command:
+```bash
+kubectl edit svc front-end -n sock-shop
+```
+- The Vim editor will come up. Scroll to a point where you see **‘type: ClusterIP’** and change it to **LoadBalancer**
+- Copy the external IP and paste in browser to see the sock shop site.
+
+### 10. Install Prometheus and Grafana Cluster Using Terraform and Helm.
+
+To efficiently manage and monitor the Kubernetes cluster, we use Terraform and Helm to configure essential components like the Nginx Ingress Controller and Prometheus. Below are the key files involved in this setup:
+
+- providers.tf: Defines the necessary providers for Terraform, including Helm, Kubernetes, and Kubectl, and specifies the path to the kube-config file.
+- nginx-ingress-helm.tf: Contains Terraform configurations for deploying the Nginx Ingress Controller using Helm, including namespace and resource definitions.
+- values.yaml: Provides configuration values for customizing the Nginx Ingress Controller installation.
+- variables.tf: Declares variables used across Terraform configurations, allowing for more flexible and reusable code.
+- null.tf: Handles resources or settings that do not directly associate with specific providers but are needed for the overall configuration.
