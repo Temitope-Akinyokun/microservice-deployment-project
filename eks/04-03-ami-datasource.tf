@@ -1,4 +1,3 @@
-
 # Get latest AMI ID for Amazon Linux2 OS
 data "aws_ami" "ubuntu" {
   most_recent = true

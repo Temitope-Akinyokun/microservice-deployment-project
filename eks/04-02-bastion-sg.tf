@@ -1,4 +1,4 @@
-/* # AWS EC2 Security Group Terraform Module
+# AWS EC2 Security Group Terraform Module
 # Security Group for Public Bastion Host
 module "public_bastion_sg" {
   source  = "terraform-aws-modules/security-group/aws"
@@ -17,4 +17,4 @@ module "public_bastion_sg" {
 
   # SG Tags
   tags = local.common_tags
-} */
+} 

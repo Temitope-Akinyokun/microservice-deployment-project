@@ -7,20 +7,20 @@ terraform {
   }
 }
 
-data "aws_eks_cluster" "hr-dev-eks-demo" {
-  name = "hr-dev-eks-demo"
+data "aws_eks_cluster" "sock-cluster" {
+  name = "sock-cluster"
 }
-data "aws_eks_cluster_auth" "hr-dev-eks-demo_auth" {
-  name = "hr-dev-eks-demo_auth"
+data "aws_eks_cluster_auth" "sock-cluster_auth" {
+  name = "sock-cluster_auth"
 }
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.hr-dev-eks-demo.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.hr-dev-eks-demo.certificate_authority[0].data)
+  host                   = data.aws_eks_cluster.sock-cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.sock-cluster.certificate_authority[0].data)
   version          = "2.16.1"
   config_path = "~/.kube/config"
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", "hr-dev-eks-demo"]
+    args        = ["eks", "get-token", "--cluster-name", "sock-cluster"]
     command     = "aws"
   }
 }

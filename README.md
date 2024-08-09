@@ -208,3 +208,17 @@ To efficiently manage and monitor the Kubernetes cluster, we use Terraform and H
 - values.yaml: Provides configuration values for customizing the Nginx Ingress Controller installation.
 - variables.tf: Declares variables used across Terraform configurations, allowing for more flexible and reusable code.
 - null.tf: Handles resources or settings that do not directly associate with specific providers but are needed for the overall configuration.
+
+10.1 Accessing Grafana and Prometheus
+
+- Run the following codes:
+
+```bash
+    terraform init # Initializes Terraform configuration.
+    terraform apply --auto-approve # Applies Terraform changes automatically.
+    kubectl get namespace # Lists Kubernetes namespaces.
+    kubectl get svc -n prometheus # Shows services in the prometheus namespace.
+    kubectl edit svc prometheus-grafana -n prometheus # Edits prometheus-grafana service to LoadBalancer.
+    kubectl get svc -n prometheus # Verifies services in the prometheus namespace.
+    kubectl edit svc prometheus-kube-prometheus-prometheus -n prometheus # Edits prometheus-kube-prometheus-prometheus service to LoadBalancer.
+```

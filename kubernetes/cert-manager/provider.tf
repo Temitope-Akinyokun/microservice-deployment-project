@@ -18,11 +18,11 @@ terraform {
 }
 
 
-data "aws_eks_cluster" "hr-dev-eks-demo" {
-  name = "hr-dev-eks-demo"
+data "aws_eks_cluster" "sock-cluster" {
+  name = "sock-cluster"
 }
-data "aws_eks_cluster_auth" "hr-dev-eks-demo_auth" {
-  name = "hr-dev-eks-demo_auth"
+data "aws_eks_cluster_auth" "sock-cluster_auth" {
+  name = "sock-cluster_auth"
 }
 
 
